@@ -1,4 +1,4 @@
-import connectDB from "@/lib/db";
+import {connectDB} from "@/lib/db";
 import User from "@/models/User";
 import Wallet from "@/models/Wallet";
 import Transaction from "@/models/Transactions";

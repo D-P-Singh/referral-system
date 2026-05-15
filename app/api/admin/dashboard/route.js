@@ -4,7 +4,6 @@ import User from "@/models/User";
 import Wallet from "@/models/Wallet";
 import Transaction from "@/models/Transactions";
 import Withdrawal from "@/models/Withdrawal";
-import Recharge from "@/models/Recharge";
 
 import { isAdmin } from "@/lib/isAdmin";
 

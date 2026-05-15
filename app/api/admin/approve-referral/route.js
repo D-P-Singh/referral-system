@@ -1,4 +1,4 @@
-import connectDB from "@/lib/db";
+import {connectDB} from "@/lib/db";
 
 import Referral from "@/models/Referral";
 import Transaction from "@/models/Transactions";
