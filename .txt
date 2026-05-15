@@ -1,0 +1,449 @@
+# Admin Task Management APIs (Next.js + MongoDB)
+
+## ✅ Updated Task Model
+
+```js
+import mongoose from "mongoose";
+
+const taskSchema =
+    new mongoose.Schema({
+
+        title: {
+            type: String,
+            required: true,
+        },
+
+        reward: {
+            type: Number,
+            default: 5,
+        },
+
+        order: {
+            type: Number,
+            required: true,
+        },
+
+        type: {
+            type: String,
+            enum: [
+                "normal",
+                "referral",
+            ],
+            default: "normal",
+        },
+
+        referralCount: {
+            type: Number,
+            default: 0,
+        },
+
+        isActive: {
+            type: Boolean,
+            default: true,
+        },
+
+    }, {
+        timestamps: true,
+    });
+
+export default mongoose.models.Task ||
+    mongoose.model(
+        "Task",
+        taskSchema
+    );
+```
+
+---
+
+# ✅ 1. CREATE TASK API
+
+## 📁 Route
+
+```txt
+/app/api/admin/tasks/route.js
+```
+
+```js
+import { NextResponse }
+from "next/server";
+
+import Task from "@/models/Task";
+import User from "@/models/User";
+
+import { connectDB }
+from "@/lib/db";
+
+import { getUser }
+from "@/lib/getUser";
+
+// CREATE TASK
+export async function POST(req) {
+
+    try {
+
+        await connectDB();
+
+        const userData =
+            await getUser();
+
+        const admin =
+            await User.findById(
+                userData.id
+            );
+
+        // ADMIN CHECK
+        if (
+            !admin ||
+            admin.role !== "admin"
+        ) {
+
+            return NextResponse.json(
+                {
+                    message:
+                        "Unauthorized",
+                },
+                { status: 403 }
+            );
+
+        }
+
+        const body =
+            await req.json();
+
+        const {
+            title,
+            reward,
+            order,
+            type,
+            referralCount,
+        } = body;
+
+        // VALIDATION
+        if (
+            !title ||
+            !reward ||
+            !order
+        ) {
+
+            return NextResponse.json(
+                {
+                    message:
+                        "All fields required",
+                },
+                { status: 400 }
+            );
+
+        }
+
+        const task =
+            await Task.create({
+
+                title,
+
+                reward,
+
+                order,
+
+                type,
+
+                referralCount,
+
+            });
+
+        return NextResponse.json({
+
+            success: true,
+
+            message:
+                "Task created successfully",
+
+            task,
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return NextResponse.json(
+            {
+                message:
+                    "Server error",
+            },
+            { status: 500 }
+        );
+
+    }
+
+}
+
+// GET ALL TASKS
+export async function GET() {
+
+    try {
+
+        await connectDB();
+
+        const tasks =
+            await Task.find()
+                .sort({ order: 1 });
+
+        return NextResponse.json({
+            tasks,
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return NextResponse.json(
+            {
+                message:
+                    "Server error",
+            },
+            { status: 500 }
+        );
+
+    }
+
+}
+```
+
+---
+
+# ✅ 2. UPDATE + DELETE TASK API
+
+## 📁 Route
+
+```txt
+/app/api/admin/tasks/[id]/route.js
+```
+
+```js
+import { NextResponse }
+from "next/server";
+
+import Task from "@/models/Task";
+import User from "@/models/User";
+
+import { connectDB }
+from "@/lib/db";
+
+import { getUser }
+from "@/lib/getUser";
+
+// UPDATE TASK
+export async function PUT(
+    req,
+    { params }
+) {
+
+    try {
+
+        await connectDB();
+
+        const userData =
+            await getUser();
+
+        const admin =
+            await User.findById(
+                userData.id
+            );
+
+        if (
+            !admin ||
+            admin.role !== "admin"
+        ) {
+
+            return NextResponse.json(
+                {
+                    message:
+                        "Unauthorized",
+                },
+                { status: 403 }
+            );
+
+        }
+
+        const body =
+            await req.json();
+
+        const task =
+            await Task.findByIdAndUpdate(
+                params.id,
+                body,
+                {
+                    new: true,
+                }
+            );
+
+        return NextResponse.json({
+
+            success: true,
+
+            message:
+                "Task updated",
+
+            task,
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return NextResponse.json(
+            {
+                message:
+                    "Server error",
+            },
+            { status: 500 }
+        );
+
+    }
+
+}
+
+// DELETE TASK
+export async function DELETE(
+    req,
+    { params }
+) {
+
+    try {
+
+        await connectDB();
+
+        const userData =
+            await getUser();
+
+        const admin =
+            await User.findById(
+                userData.id
+            );
+
+        if (
+            !admin ||
+            admin.role !== "admin"
+        ) {
+
+            return NextResponse.json(
+                {
+                    message:
+                        "Unauthorized",
+                },
+                { status: 403 }
+            );
+
+        }
+
+        await Task.findByIdAndDelete(
+            params.id
+        );
+
+        return NextResponse.json({
+
+            success: true,
+
+            message:
+                "Task deleted",
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return NextResponse.json(
+            {
+                message:
+                    "Server error",
+            },
+            { status: 500 }
+        );
+
+    }
+
+}
+```
+
+---
+
+# ✅ Example Create Request
+
+```js
+const res = await fetch(
+   "/api/admin/tasks",
+   {
+      method: "POST",
+
+      headers: {
+         "Content-Type":
+         "application/json",
+      },
+
+      body: JSON.stringify({
+
+         title:
+         "Daily Login",
+
+         reward: 5,
+
+         order: 1,
+
+         type: "normal",
+
+      }),
+   }
+);
+```
+
+---
+
+# ✅ Referral Task Example
+
+```js
+{
+   title:
+   "Complete 2 referrals",
+
+   reward: 50,
+
+   order: 4,
+
+   type: "referral",
+
+   referralCount: 2,
+}
+```
+
+---
+
+# ✅ Recommended Admin Features
+
+## Admin Can:
+
+* Create task
+* Edit task
+* Delete task
+* Change reward
+* Change order
+* Enable/Disable task
+* Create referral tasks
+* Create special event tasks
+
+---
+
+# ✅ Recommended Future Tasks
+
+```txt
+Daily Login
+Watch Ad
+Telegram Join
+Instagram Follow
+Complete Profile
+Refer Friends
+Spin Wheel
+Quiz Task
+Recharge Task
+```
