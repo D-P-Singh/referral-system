@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 export default function ReferralsPage() {
     const [data, setData] =
         useState(null);
-
+    const [referralLink, setReferralLink] = useState("");
     const [loading, setLoading] =
         useState(true);
     useEffect(() => {
@@ -24,8 +24,7 @@ export default function ReferralsPage() {
 
     }, []);
 
-    const fetchReferrals =
-        async () => {
+    const fetchReferrals =async () => {
             try {
 
                 const res =
@@ -55,10 +54,21 @@ export default function ReferralsPage() {
             }
 
         };
-    const referralCode = "DEV100";
-    //const referralLink = `https://yourwebsite.com/register?ref=${referralCode}`;
-    const referralLink =
-        `${window.location.origin}${data?.referralLink}`
+   
+
+    useEffect(() => {
+
+        if (typeof window !== "undefined" && data?.referralLink) {
+
+            setReferralLink(
+                `${window.location.origin}${data.referralLink}`
+            );
+
+        }
+
+    }, [data]);
+ 
+   
 
     const totalReferrals = 12;
     const successfulReferrals = 8;
