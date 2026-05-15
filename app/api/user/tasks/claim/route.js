@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import {connectDB} from "@/lib/db";
+import { connectDB } from "@/lib/db";
 import Task from "@/models/Task";
 import User from "@/models/User";
 import Wallet from "@/models/Wallet";
@@ -29,7 +29,13 @@ export async function POST(req) {
                 { status: 404 }
             );
         }
+        if (user.accountStatus == "inactive") {
+            return NextResponse.json(
+                { message: "You ID is not active please contect admin" },
+                { status: 403 }
+            );
 
+        }
         if (user.isBlocked) {
             return NextResponse.json(
                 { message: "Account blocked" },

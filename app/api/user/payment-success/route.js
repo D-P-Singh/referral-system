@@ -1,4 +1,4 @@
-import {connectDB} from "@/lib/db";
+import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import Wallet from "@/models/Wallet";
 import Transaction from "@/models/Transactions";
@@ -31,6 +31,7 @@ export async function POST(req) {
         // ✅ activate user
         user.paymentStatus = "success";
         user.accountStatus = "active";
+        user.totalReferrals += 1;
         await user.save();
 
         // =========================

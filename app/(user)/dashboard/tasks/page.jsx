@@ -72,7 +72,6 @@ export default function TaskPage() {
 
     // FETCH TASKS
     const fetchTasks = async () => {
-
         try {
 
             let res =

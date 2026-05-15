@@ -61,7 +61,7 @@ export default function ReferralsPage() {
         if (typeof window !== "undefined" && data?.referralLink) {
 
             setReferralLink(
-                `${window.location.origin}${data.referralLink}`
+                `${window.location.origin}/register?=${data.referralCode}` || data?.referralLink
             );
 
         }

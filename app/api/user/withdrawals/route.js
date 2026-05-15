@@ -3,8 +3,10 @@ import User from "@/models/User";
 import Wallet from "@/models/Wallet";
 import Withdrawal from "@/models/Withdrawal";
 import Transaction from "@/models/Transactions";
+import SystemSettings from "@/models/SystemSettings";
 import { getUser } from "@/lib/getUser";
 import { NextResponse } from "next/server";
+SystemSettings
 
 // =========================
 // POST WITHDRAW REQUEST
@@ -14,15 +16,30 @@ export async function POST(req) {
         await connectDB();
 
         const currentUser = await getUser();
-
-        if (!currentUser) {
+        const user = await User.findById(currentUser.id);
+      
+        if (!user) {
             return NextResponse.json(
-                { success: false, message: "Unauthorized" },
-                { status: 401 }
+                { success: false, message: "User not found" },
+                { status: 404 }
+            );
+        }
+        if (user.accountStatus == "inactive") {
+            return NextResponse.json(
+                { message: "You ID is not active please contect admin" },
+                { status: 403 }
+            );
+        }
+
+        if (user.isBlocked) {
+            return NextResponse.json(
+                { message: "Account blocked" },
+                { status: 403 }
             );
         }
 
         const { amount, method, details } = await req.json();
+
 
         if (!amount || !method || !details) {
             return NextResponse.json(
@@ -31,21 +48,22 @@ export async function POST(req) {
             );
         }
 
-        if (amount < 100) {
-            return NextResponse.json(
-                { success: false, message: "Minimum withdraw is ₹100" },
-                { status: 400 }
-            );
+        const settings = await SystemSettings.findOne();
+
+        if (amount < settings.minimumWithdraw) {
+            return Response.json({
+                success: false,
+                message: `Minimum withdraw is ₹${settings.minimumWithdraw}`,
+            });
         }
 
-        const user = await User.findById(currentUser.id);
-
-        if (!user) {
+        if (!user.totalReferrals >= 2) {
             return NextResponse.json(
-                { success: false, message: "User not found" },
-                { status: 404 }
+                { message: "Complete 2 Refferls and Try again" },
+                { status: 403 }
             );
         }
+      
 
         // 💰 wallet fetch
         const wallet = await Wallet.findOne({ user: user._id });
