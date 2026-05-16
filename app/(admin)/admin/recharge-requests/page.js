@@ -17,7 +17,7 @@ export default function RechargeRequestsPage() {
     const [selectedId, setSelectedId] = useState(null);
     const [rejectNote, setRejectNote] = useState("");
     const fetchRequests = async () => {
-        let res = await fetch("/api/admin/recharge")
+        let res = await fetch("/api/admin/recharge/requests")
         res = await res.json();
         console.log(res)
         setRechargeRequests(res?.recharges)

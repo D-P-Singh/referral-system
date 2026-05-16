@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function RegisterPage() {
     const searchParams = useSearchParams();
+    const [lodding, setLodding] = useState(false)
     const router = useRouter();
     const referralCode = searchParams?.get("ref");
     const [formData, setFormData] =
@@ -30,7 +31,7 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
 
         e.preventDefault();
-
+setLodding(true);
         //  console.log(formData);
         // API call here to register user with formData
         const response = await fetch("/api/auth/register", {
@@ -42,6 +43,7 @@ export default function RegisterPage() {
             body: JSON.stringify(formData),
         });
         const data = await response.json();
+        setLodding(false);
         if (!data.success) {
             alert(data.message);
             return
@@ -170,12 +172,19 @@ export default function RegisterPage() {
                                 />
                             </div>
 
-
                             <button
                                 type="submit"
-                                className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-all duration-300"
+                                disabled={lodding}
+                                className={`
+    w-full h-14 rounded-2xl text-white font-bold text-lg
+    shadow-lg transition-all duration-300
+    ${lodding
+                                        ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                        : "w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                    }
+  `}
                             >
-                                Create Account
+                                {lodding ? "Loading..." : "Create Account"}
                             </button>
                         </form>
 

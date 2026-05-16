@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-
+import Link from "next/link";
 import {
     FaArrowUp,
     FaWallet,
@@ -71,6 +71,7 @@ export default function DashboardPage() {
     return (
 
         <div className={`space-y-8`}>
+            
 
             {/* Welcome Banner */}
 {
@@ -162,8 +163,10 @@ export default function DashboardPage() {
    "
                 >
 
+                         
                     <h2 className="font-bold text-lg">
-                        Activate Your Account 🚀
+                            Activate Your Account 🚀
+                       
                     </h2>
 
                     <p className="mt-2 text-sm leading-6">
@@ -176,19 +179,16 @@ export default function DashboardPage() {
                         • Withdrawals
                     </p>
 
-                    <button
-                        className="
-         mt-4
-         h-12
-         px-5
-         rounded-xl
-         bg-amber-500
-         text-white
-         font-bold
-      "
-                    >
-                        Activate Now
-                    </button>
+
+                        <Link className="cursor-pointer" href={"/dashboard/recharge"}>
+                            <button
+                                className=" mt-4 h-12 px-5 rounded-xl bg-amber-500 text-white font-bold cursor-pointer "
+                            >
+                               Activate Now
+                            </button>
+                               </Link>
+                        
+                 
 
                 </div>
 }

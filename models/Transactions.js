@@ -41,6 +41,7 @@ const transactionSchema =
 
             enum: [
                 "referral",
+                "referral_bonus",
                 "daily_reward",
                 "daily_referral_reward",
                 "withdrawal",

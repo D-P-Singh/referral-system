@@ -4,11 +4,22 @@ import mongoose from "mongoose";
 
 const systemSettingsSchema = new mongoose.Schema(
     {
+
+        name: {
+            type: String,
+        },
         minimumWithdraw: {
             type: Number,
             default: 100,
         },
-
+ referralReward: {
+      type: Number,
+      default: 20
+   },
+    activationValidityDays: {
+      type: Number,
+      default: 90
+   },
         maximumWithdraw: {
             type: Number,
             default: 5000,

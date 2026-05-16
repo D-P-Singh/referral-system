@@ -6,7 +6,7 @@ import Transaction from "@/models/Transactions";
 import SystemSettings from "@/models/SystemSettings";
 import { getUser } from "@/lib/getUser";
 import { NextResponse } from "next/server";
-SystemSettings
+
 
 // =========================
 // POST WITHDRAW REQUEST

@@ -41,7 +41,7 @@ export default function Navbar() {
             text-slate-900
           "
                 >
-                    Dashboard 👋
+                    
                 </h1>
 
                 <p className="text-sm text-slate-500 mt-1">

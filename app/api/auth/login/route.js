@@ -7,7 +7,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
 import jwt from "jsonwebtoken";
-import generateToken from "../../../../utils/generateToken";
+import generateToken from "@/utils/generateToken";
 
 export async function POST(req) {
 
@@ -43,6 +43,7 @@ export async function POST(req) {
         if (!isMatch) {
 
             return Response.json({
+                isBlocked: user.isBlocked,
                 success: false,
                 msg: "Wrong Password",
             });

@@ -12,31 +12,10 @@ import {
     ArrowUpRight,
 } from "lucide-react";
 
-const withdrawals = [
-    {
-        id: 1,
-        amount: 200,
-        method: "Bank Transfer",
-        status: "completed",
-        date: "12 May 2026",
-    },
-    {
-        id: 2,
-        amount: 150,
-        method: "UPI",
-        status: "pending",
-        date: "10 May 2026",
-    },
-    {
-        id: 3,
-        amount: 300,
-        method: "Bank Transfer",
-        status: "completed",
-        date: "05 May 2026",
-    },
-];
+
 
 export default function WithdrawPage() {
+    const{wallet} = useAuth();
     const [amount, setAmount] = useState("");
     const [method, setMethod] =
         useState("Bank Transfer");
@@ -119,8 +98,7 @@ export default function WithdrawPage() {
             try {
                 const res =
                     await fetch(
-                        "/api/user/withdrawals"
-                    );
+                        "/api/user/withdrawals");
                 const data =
                     await res.json();
                 console.log(data);
@@ -164,7 +142,7 @@ console.log("widhraw histrory",withdrawals)
 
                                 <h2 className="text-4xl font-bold mt-3 flex items-center gap-1">
                                     <IndianRupee size={34} />
-                                    {user?.walletBalance}
+                                    {wallet?.balance} 
                                 </h2>
                             </div>
 
@@ -397,7 +375,7 @@ console.log("widhraw histrory",withdrawals)
                                     Total Withdrawn
                                 </p>
                                 <h3 className="text-2xl font-bold mt-2">
-                                    ₹650
+                                    ₹{withdrawals?.totalWithdraw || 0}
                                 </h3>
                             </div>
 

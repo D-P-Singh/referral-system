@@ -75,6 +75,16 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    activatedAt: {
+        type:Date,
+        default:null
+    },
+
+    activationExpiresAt: {
+        type:Date,
+        default:null
+    },
+
     totalReferrals: {
         type: Number,
         default: 0

@@ -42,7 +42,7 @@ const menuItems = [
     {
         name: "Recharge Request",
         icons: "",
-        path: "/admin/recharge-request"
+        path: "/admin/recharge-requests"
     },
     {
         name: "Transactions",
@@ -52,7 +52,7 @@ const menuItems = [
     {
         name: "Withdraw Requests",
         icon: <FaMoneyBillWave />,
-        path: "/admin/withdrawal-request",
+        path: "/admin/withdraw-requests",
     },
     {
         name: "Wallet",

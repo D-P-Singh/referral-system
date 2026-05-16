@@ -1,172 +1,285 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import {
-    FaCamera,
     FaEnvelope,
     FaPhone,
-    FaUserGraduate,
-    FaUniversity,
-    FaMapMarkerAlt,
+    FaUser,
     FaCalendarAlt,
     FaEdit,
     FaShieldAlt,
+    FaSave,
+    FaTimes,
+    FaWallet,
+    FaUsers,
 } from "react-icons/fa";
 
 export default function ProfilePage() {
- 
-    const[user, setUser] = useState({});
+
+    const [user, setUser] = useState({});
+
+    const [isEditing, setIsEditing] =
+        useState(false);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [formData, setFormData] =
+        useState({
+            name: "",
+            phone: "",
+            email:"",
+        });
+
+    // fetch profile
     useEffect(() => {
+
         fetch("/api/user/profile")
             .then((res) => res.json())
             .then((data) => {
+
                 setUser(data.user);
+
+                setFormData({
+                    name: data.user?.name || "",
+                    phone: data.user?.phone || "",
+                    phone:data.user?.email||"",
+                });
             });
+
     }, []);
-// const user = {
-//     name: "John Doe",
-//     email: "john.doe@example.com",
-//     phone: "+1 234 567 890",
-//     college: "ABC University",
-//     course: "Computer Science",
-//     profileImage: "/images/profile.jpg"
-// };
+
+    // handle input
+    const handleChange = (e) => {
+
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    // update profile
+    const handleSave = async () => {
+
+        try {
+
+            setLoading(true);
+
+            const res = await fetch(
+                "/api/user/profile/update",
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            const data = await res.json();
+
+            if (data.success) {
+
+                setUser(data.user);
+
+                setIsEditing(false);
+            }
+
+        } catch (err) {
+
+            console.log(err);
+
+        } finally {
+
+            setLoading(false);
+        }
+    };
+
     return (
 
         <div className="space-y-8">
 
-            {/* Top Banner */}
+            {/* TOP PROFILE CARD */}
 
             <div
                 className="
-          relative overflow-hidden
-          rounded-[32px]
-          bg-gradient-to-r
-          from-indigo-600
-          via-violet-600
-          to-purple-600
-          p-8 lg:p-10
-          text-white
-          shadow-2xl
-        "
+                relative overflow-hidden
+                rounded-[25px]
+               bg-gradient-to-r
+                    from-indigo-600
+                    via-violet-600
+                    to-purple-600
+                p-8 lg:p-10
+                shadow-2xl
+                text-white
+            "
             >
+
+                {/* glow */}
 
                 <div
                     className="
-            absolute top-0 right-0
-            w-96 h-96
-            bg-white/10 rounded-full
-            blur-3xl
-          "
+                    absolute
+                    top-0 right-0
+                     w-72 h-72
+                    rounded-full
+                    bg-violet-500/20
+                    blur-3xl
+                "
                 />
 
                 <div
                     className="
-            relative z-10
-            flex flex-col lg:flex-row
-            items-start lg:items-center
-            justify-between gap-8
-          "
+                    relative z-10
+                    flex flex-col lg:flex-row
+                    items-start lg:items-center
+                    justify-between
+                    gap-10
+                "
                 >
 
-                    {/* Profile Left */}
+                    {/* LEFT */}
 
                     <div className="flex items-center gap-6">
 
-                        <div className="relative">
+                        {/* AVATAR */}
 
-                            <img
-                                src={user?.profileImage}
-                                alt="profile"
-                                className="
-                  w-32 h-32
-                  rounded-[30px]
-                  object-cover
-                  border-4 border-white/20
-                  shadow-2xl
-                "
-                            />
-
-                            <button
-                                className="
-                  absolute bottom-2 right-2
-                  w-11 h-11
-                  rounded-2xl
-                  bg-white text-indigo-600
-                  flex items-center justify-center
-                  shadow-lg
-                "
-                            >
-
-                                <FaCamera />
-
-                            </button>
-
+                        <div
+                            className="
+                            w-28 h-28
+                            rounded-[32px]
+                            bg-gradient-to-br
+                            from-indigo-500
+                            to-violet-600
+                            flex items-center
+                            justify-center
+                            text-4xl
+                            font-black
+                            shadow-2xl
+                            border border-white/10
+                        "
+                        >
+                            {
+                                user?.name?.charAt(0)
+                            }
                         </div>
+
+                        {/* USER INFO */}
 
                         <div>
 
                             <div className="flex items-center gap-3 flex-wrap">
 
-                                <h1 className="text-4xl font-black">
-                                    {user?.name}
-                                </h1>
+                                {
+                                    isEditing ? (
+
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className="
+                                                px-5 py-3
+                                                rounded-2xl
+                                                text-black
+                                                text-2xl
+                                                font-black
+                                                outline-none
+                                            "
+                                        />
+
+                                    ) : (
+
+                                        <h1
+                                            className="
+                                            text-2xl
+                                            lg:text-5xl
+                                            font-black
+                                        "
+                                        >
+                                            {user?.name}
+                                        </h1>
+                                    )
+                                }
 
                                 {
                                     user?.isVerified && (
 
                                         <div
                                             className="
-                        px-4 py-2
-                        rounded-2xl
-                        bg-emerald-400/20
-                        border border-emerald-300/30
-                        text-sm font-bold
-                        flex items-center gap-2
-                      "
+                                            px-4 py-2
+                                            rounded-2xl
+                                            bg-emerald-500/20
+                                            border border-emerald-400/20
+                                            text-sm
+                                            font-bold
+                                            flex items-center gap-2
+                                        "
                                         >
-
                                             <FaShieldAlt />
 
                                             Verified
-
                                         </div>
                                     )
                                 }
 
                             </div>
 
-                            <p className="mt-3 text-indigo-100 text-lg">
-                                Student Member
+                            <p
+                                className="
+                                mt-3
+                                text-slate-300
+                                text-lg
+                            "
+                            >
+                                Premium Member
                             </p>
 
-                            <div className="mt-5 flex flex-wrap gap-3">
+                            <div
+                                className="
+                                mt-6
+                                flex flex-wrap
+                                gap-4
+                            "
+                            >
 
                                 <div
                                     className="
-                    px-5 py-3 rounded-2xl
-                    bg-white/10 backdrop-blur-md
-                    border border-white/10
-                    text-sm font-semibold
-                  "
+                                    px-5 py-3
+                                    rounded-2xl
+                                    bg-white/10
+                                    border border-white/10
+                                    backdrop-blur-xl
+                                    text-sm
+                                    font-semibold
+                                    flex items-center gap-3
+                                "
                                 >
-                                    Referral Code:
-                                    {" "}
+                                    <FaUsers />
+
                                     {user?.referralCode}
                                 </div>
 
                                 <div
                                     className="
-                    px-5 py-3 rounded-2xl
-                    bg-white/10 backdrop-blur-md
-                    border border-white/10
-                    text-sm font-semibold
-                  "
+                                    px-5 py-3
+                                    rounded-2xl
+                                    bg-white/10
+                                    border border-white/10
+                                    backdrop-blur-xl
+                                    text-sm
+                                    font-semibold
+                                    flex items-center gap-3
+                                "
                                 >
-                                    Wallet:
-                                    {" "}
+                                    <FaWallet />
+
                                     ₹
-                                    {user?.walletBalance}
+                                    {user?.walletBalance || 0}
                                 </div>
 
                             </div>
@@ -175,490 +288,368 @@ export default function ProfilePage() {
 
                     </div>
 
-                    {/* Edit Button */}
+                    {/* ACTIONS */}
 
-                    <button
-                        className="
-              h-14 px-7
-              rounded-2xl
-              bg-white text-indigo-700
-              font-bold
-              flex items-center gap-3
-              hover:scale-105
-              transition-all duration-300
-              shadow-xl
-            "
-                    >
+                    <div className="flex gap-3">
 
-                        <FaEdit />
+                        {
+                            isEditing ? (
 
-                        Edit Profile
+                                <>
 
-                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={loading}
+                                        className="
+                                            h-14 px-7
+                                            rounded-2xl
+                                            bg-emerald-500
+                                            hover:bg-emerald-600
+                                            transition-all
+                                            font-bold
+                                            flex items-center gap-3
+                                            shadow-xl
+                                        "
+                                    >
+                                        <FaSave />
+
+                                        {
+                                            loading
+                                                ? "Saving..."
+                                                : "Save"
+                                        }
+                                    </button>
+
+                                    <button
+                                        onClick={() =>
+                                            setIsEditing(false)
+                                        }
+                                        className="
+                                            h-14 px-7
+                                            rounded-2xl
+                                            bg-red-500
+                                            hover:bg-red-600
+                                            transition-all
+                                            font-bold
+                                            flex items-center gap-3
+                                            shadow-xl
+                                        "
+                                    >
+                                        <FaTimes />
+
+                                        Cancel
+                                    </button>
+
+                                </>
+
+                            ) : (
+
+                                <button
+                                    onClick={() =>
+                                        setIsEditing(true)
+                                    }
+                                    className="
+                                        h-14 px-7
+                                        rounded-2xl
+                                        bg-white
+                                        text-slate-900
+                                        font-bold
+                                        flex items-center gap-3
+                                        shadow-xl
+                                        hover:scale-105
+                                        transition-all
+                                    "
+                                >
+                                    <FaEdit />
+
+                                    Edit Profile
+                                </button>
+                            )
+                        }
+
+                    </div>
 
                 </div>
 
             </div>
 
-            {/* Stats */}
-
-            {/* <div
-                className="
-          grid
-          sm:grid-cols-2
-          xl:grid-cols-4
-          gap-6
-        "
-            >
-
-                <div
-                    className="
-            bg-white rounded-3xl
-            p-6 shadow-lg
-            border border-slate-100
-          "
-                >
-
-                    <p className="text-slate-500 text-sm">
-                        Total Earned
-                    </p>
-
-                    <h2 className="text-3xl font-black mt-3">
-                        ₹
-                        {user.totalEarned}
-                    </h2>
-
-                </div>
-
-                <div
-                    className="
-            bg-white rounded-3xl
-            p-6 shadow-lg
-            border border-slate-100
-          "
-                >
-
-                    <p className="text-slate-500 text-sm">
-                        Referrals
-                    </p>
-
-                    <h2 className="text-3xl font-black mt-3">
-                        {
-                            user.successfulReferrals
-                        }
-                    </h2>
-
-                </div>
-
-                <div
-                    className="
-            bg-white rounded-3xl
-            p-6 shadow-lg
-            border border-slate-100
-          "
-                >
-
-                    <p className="text-slate-500 text-sm">
-                        Wallet Balance
-                    </p>
-
-                    <h2 className="text-3xl font-black mt-3">
-                        ₹
-                        {user.walletBalance}
-                    </h2>
-
-                </div>
-
-                <div
-                    className="
-            bg-white rounded-3xl
-            p-6 shadow-lg
-            border border-slate-100
-          "
-                >
-
-                    <p className="text-slate-500 text-sm">
-                        Joined
-                    </p>
-
-                    <h2 className="text-2xl font-black mt-3">
-                        {user.joinedAt}
-                    </h2>
-
-                </div>
-
-            </div> */}
-
-            {/* Profile Details */}
+            {/* DETAILS SECTION */}
 
             <div
                 className="
-          grid lg:grid-cols-3 gap-6
-        "
+                grid
+                lg:grid-cols-2
+                gap-6
+            "
             >
 
-                {/* Left Info */}
+                {/* LEFT CARD */}
 
                 <div
                     className="
-            lg:col-span-2
-            bg-white rounded-3xl
-            p-8 shadow-lg
-            border border-slate-100
-          "
+                    bg-white
+                    rounded-[32px]
+                    p-8
+                    shadow-xl
+                    border border-slate-100
+                "
                 >
 
-                    <div className="flex items-center justify-between">
+                    <div className="mb-8">
 
-                        <h2 className="text-2xl font-black text-slate-900">
-                            Personal Information
+                        <h2
+                            className="
+                            text-3xl
+                            font-black
+                            text-slate-900
+                        "
+                        >
+                            Personal Details
                         </h2>
 
-                        <button
-                            className="
-                text-indigo-600
-                font-bold
-              "
-                        >
-                            Edit
-                        </button>
+                        <p className="text-slate-500 mt-2">
+                            Manage your profile information
+                        </p>
 
                     </div>
 
-                    <div
-                        className="
-              mt-8
-              grid md:grid-cols-2
-              gap-6
-            "
-                    >
+                    <div className="space-y-6">
 
-                        {/* Email */}
+                        {/* NAME */}
 
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
+                        <DetailCard
+                            icon={<FaUser />}
+                            title="Full Name"
                         >
 
-                            <div className="flex items-center gap-3">
+                            {
+                                isEditing ? (
 
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-indigo-100
-                    flex items-center justify-center
-                    text-indigo-600
-                  "
-                                >
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        className="
+                                            w-full
+                                            mt-3
+                                            px-4 py-3
+                                            rounded-2xl
+                                            border
+                                            outline-none
+                                        "
+                                    />
 
-                                    <FaEnvelope />
+                                ) : (
 
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        Email Address
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.email}
+                                    <h3
+                                        className="
+                                        text-xl
+                                        font-black
+                                        text-slate-900
+                                        mt-2
+                                    "
+                                    >
+                                        {user?.name || "-"}
                                     </h3>
+                                )
+                            }
 
-                                </div>
+                        </DetailCard>
 
-                            </div>
+                        {/* EMAIL */}
 
-                        </div>
-
-                        {/* Phone */}
-
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
+                        <DetailCard
+                            icon={<FaEnvelope />}
+                            title="Email Address"
                         >
 
-                            <div className="flex items-center gap-3">
+                            <h3
+                                className="
+                                text-xl
+                                font-black
+                                text-slate-900
+                                mt-2
+                            "
+                            >
+                                {user?.email || "-"}
+                            </h3>
 
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-emerald-100
-                    flex items-center justify-center
-                    text-emerald-600
-                  "
-                                >
+                        </DetailCard>
 
-                                    <FaPhone />
+                        {/* PHONE */}
 
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        Phone Number
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.phone}
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* College */}
-
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
+                        <DetailCard
+                            icon={<FaPhone />}
+                            title="Phone Number"
                         >
 
-                            <div className="flex items-center gap-3">
+                            {
+                                isEditing ? (
 
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-violet-100
-                    flex items-center justify-center
-                    text-violet-600
-                  "
-                                >
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className="
+                                            w-full
+                                            mt-3
+                                            px-4 py-3
+                                            rounded-2xl
+                                            border
+                                            outline-none
+                                        "
+                                    />
 
-                                    <FaUniversity />
+                                ) : (
 
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        College
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.college}
+                                    <h3
+                                        className="
+                                        text-xl
+                                        font-black
+                                        text-slate-900
+                                        mt-2
+                                    "
+                                    >
+                                        {user?.phone || "-"}
                                     </h3>
+                                )
+                            }
 
-                                </div>
+                        </DetailCard>
 
-                            </div>
+                        {/* JOINED */}
 
-                        </div>
-
-                        {/* Course */}
-
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
+                        <DetailCard
+                            icon={<FaCalendarAlt />}
+                            title="Joined Date"
                         >
 
-                            <div className="flex items-center gap-3">
+                            <h3
+                                className="
+                                text-xl
+                                font-black
+                                text-slate-900
+                                mt-2
+                            "
+                            >
+                                {
+                                   user?.activatedAt || user?.createdAt
+                                        ? new Date(
+                                            user.createdAt
+                                        ).toLocaleDateString()
+                                        : "-"
+                                }
+                            </h3>
 
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-pink-100
-                    flex items-center justify-center
-                    text-pink-600
-                  "
-                                >
-
-                                    <FaUserGraduate />
-
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        Course
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.course}
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* Location */}
-
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
-                        >
-
-                            <div className="flex items-center gap-3">
-
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-orange-100
-                    flex items-center justify-center
-                    text-orange-600
-                  "
-                                >
-
-                                    <FaMapMarkerAlt />
-
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        Location
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.city}
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* Joined */}
-
-                        <div
-                            className="
-                bg-slate-50
-                rounded-2xl
-                p-5
-              "
-                        >
-
-                            <div className="flex items-center gap-3">
-
-                                <div
-                                    className="
-                    w-12 h-12
-                    rounded-2xl
-                    bg-cyan-100
-                    flex items-center justify-center
-                    text-cyan-600
-                  "
-                                >
-
-                                    <FaCalendarAlt />
-
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm text-slate-500">
-                                        Joined At
-                                    </p>
-
-                                    <h3 className="font-bold text-slate-900 mt-1">
-                                        {user?.joinedAt}
-                                    </h3>
-
-                                </div>
-
-                            </div>
-
-                        </div>
+                        </DetailCard>
 
                     </div>
 
                 </div>
 
-                {/* Right Side */}
+                {/* RIGHT SIDE */}
 
-                <div
-                    className="
-            bg-white rounded-3xl
-            p-8 shadow-lg
-            border border-slate-100
-          "
-                >
+                <div className="space-y-6">
 
-                    <h2 className="text-2xl font-black text-slate-900">
-                        Account Status
-                    </h2>
+                    {/* WALLET */}
 
-                    <div className="mt-8 space-y-5">
+                    <div
+                        className="
+                        rounded-[32px]
+                        bg-gradient-to-br
+                        from-indigo-600
+                        to-violet-700
+                        p-8
+                        text-white
+                        shadow-2xl
+                    "
+                    >
+
+                        <p className="text-indigo-100">
+                            Wallet Balance
+                        </p>
+
+                        <h1
+                            className="
+                            text-5xl
+                            font-black
+                            mt-4
+                        "
+                        >
+                            ₹
+                            {user?.walletBalance || 0}
+                        </h1>
 
                         <div
                             className="
-                bg-emerald-50
-                border border-emerald-100
-                rounded-2xl
-                p-5
-              "
+                            mt-6
+                            h-3
+                            rounded-full
+                            bg-white/20
+                            overflow-hidden
+                        "
                         >
 
-                            <p className="text-sm text-emerald-600 font-semibold">
-                                Verification Status
-                            </p>
-
-                            <h3 className="text-xl font-black text-emerald-700 mt-2">
-                                Verified Account
-                            </h3>
+                            <div
+                                className="
+                                h-full
+                                w-[70%]
+                                bg-white
+                                rounded-full
+                            "
+                            />
 
                         </div>
 
-                        <div
+                    </div>
+
+                    {/* ACCOUNT STATUS */}
+
+                    <div
+                        className="
+                        bg-white
+                        rounded-[32px]
+                        p-8
+                        shadow-xl
+                        border border-slate-100
+                    "
+                    >
+
+                        <h2
                             className="
-                bg-indigo-50
-                border border-indigo-100
-                rounded-2xl
-                p-5
-              "
+                            text-2xl
+                            font-black
+                            text-slate-900
+                        "
                         >
+                            Account Status
+                        </h2>
 
-                            <p className="text-sm text-indigo-600 font-semibold">
-                                Membership
-                            </p>
+                        <div className="mt-8 space-y-5">
 
-                            <h3 className="text-xl font-black text-indigo-700 mt-2">
-                                Premium Student
-                            </h3>
+                            <StatusBox
+                                title="Verification"
+                                value={
+                                    user?.isVerified
+                                        ? "Verified"
+                                        : "Pending"
+                                }
+                            />
 
-                        </div>
+                            <StatusBox
+                                title="Membership"
+                                value="Premium Plan"
+                            />
 
-                        <div
-                            className="
-                bg-violet-50
-                border border-violet-100
-                rounded-2xl
-                p-5
-              "
-                        >
-
-                            <p className="text-sm text-violet-600 font-semibold">
-                                Referral Rank
-                            </p>
-
-                            <h3 className="text-xl font-black text-violet-700 mt-2">
-                                Gold Member
-                            </h3>
+                            <StatusBox
+                                title="Account"
+                                value={
+                                    user?.accountStatus ||
+                                    "Active"
+                                }
+                            />
 
                         </div>
 
@@ -667,6 +658,99 @@ export default function ProfilePage() {
                 </div>
 
             </div>
+
+        </div>
+    );
+}
+
+// =====================
+// DETAIL CARD
+// =====================
+
+function DetailCard({
+    icon,
+    title,
+    children,
+}) {
+
+    return (
+
+        <div
+            className="
+            p-5
+            rounded-3xl
+            bg-slate-50
+            border border-slate-100
+        "
+        >
+
+            <div className="flex items-start gap-4">
+
+                <div
+                    className="
+                    w-14 h-14
+                    rounded-2xl
+                    bg-indigo-100
+                    text-indigo-600
+                    flex items-center
+                    justify-center
+                    text-xl
+                    shrink-0
+                "
+                >
+                    {icon}
+                </div>
+
+                <div className="w-full">
+
+                    <p className="text-slate-500">
+                        {title}
+                    </p>
+
+                    {children}
+
+                </div>
+
+            </div>
+
+        </div>
+    );
+}
+
+// =====================
+// STATUS BOX
+// =====================
+
+function StatusBox({
+    title,
+    value,
+}) {
+
+    return (
+
+        <div
+            className="
+            p-5
+            rounded-3xl
+            bg-slate-50
+            border border-slate-100
+        "
+        >
+
+            <p className="text-slate-500">
+                {title}
+            </p>
+
+            <h3
+                className="
+                text-xl
+                font-black
+                text-slate-900
+                mt-2
+            "
+            >
+                {value}
+            </h3>
 
         </div>
     );

@@ -9,6 +9,7 @@ export default function ModernLoginPage() {
       phone: "",
       password: "",
     });
+  const [lodding, setLodding] = useState(false)
   const handleChange = (e) => {
 
     setFormData({
@@ -23,7 +24,7 @@ export default function ModernLoginPage() {
   const handleSubmit = async (e) => {
 
     e.preventDefault();
-
+setLodding(true)
     console.log(formData);
     // API call here to register user with formData
     const response = await fetch("/api/auth/login", {
@@ -35,6 +36,8 @@ export default function ModernLoginPage() {
       body: JSON.stringify(formData),
     });
     const data = await response.json();
+    //console.log(data)
+    setLodding(false)
     if (!data.success) {
       return
     }
@@ -134,9 +137,17 @@ export default function ModernLoginPage() {
 
               <button
                 type="submit"
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-all duration-300"
+                disabled={lodding}
+                className={`
+    w-full h-14 rounded-2xl text-white font-bold text-lg
+    shadow-lg transition-all duration-300
+    ${lodding
+                    ? "bg-gray-400 cursor-not-allowed opacity-70"
+                    : "bg-gradient-to-r from-indigo-600 to-violet-600 hover:scale-[1.02] cursor-pointer"
+                  }
+  `}
               >
-                Login Now
+                {lodding ? "Loading..." : "Login Now"}
               </button>
             </form>
 
@@ -161,7 +172,7 @@ export default function ModernLoginPage() {
             <p className="text-center text-slate-500 mt-10">
               Don’t have an account?
 
-              <span onClick={() => { router.push("/register") }}  className="text-indigo-600 font-bold cursor-pointer ml-2">
+              <span onClick={() => { router.push("/register") }} className="text-indigo-600 font-bold cursor-pointer ml-2">
                 Create Account
               </span>
             </p>
